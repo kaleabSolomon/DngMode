@@ -38,8 +38,9 @@ export async function findSourceDirectories(currentPath) {
 
     // Check if any children have code files
     if (await containsCodeFiles(currentPath)) {
-      sourceDirs.push(currentPath); // Add the directory to sourceDirs if it has code files
-      return sourceDirs; // Return as we shouldn't go deeper into this directory
+      sourceDirs.push(currentPath);
+
+      return sourceDirs;
     }
 
     // Otherwise, recursively check each subdirectory

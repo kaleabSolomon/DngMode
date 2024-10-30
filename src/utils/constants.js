@@ -87,6 +87,7 @@ export const codeExtensions = [
   "Dockerfile",
   ".yaml",
   ".yml",
+  ".dockerignore",
 
   // Terraform
   ".tf",
@@ -112,4 +113,6 @@ export const codeExtensions = [
   // Miscellaneous project-related
   "Makefile",
   "CMakeLists.txt",
+
+  ".json",
 ];
