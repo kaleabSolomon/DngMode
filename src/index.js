@@ -1,8 +1,7 @@
-import { findSourceDirectories } from "./utils/listDir.js";
+import { mapProjects } from "./utils/listDir.js";
 import displayBanner from "./welcome.js";
 
 displayBanner();
-let list = [];
-list = await findSourceDirectories("/home/kaleab/Documents/Dev/");
+const projectList = await mapProjects("/home/kaleab/Documents/Dev/");
 
-console.log(list);
+console.log(projectList);

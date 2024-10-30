@@ -59,3 +59,12 @@ export async function findSourceDirectories(currentPath) {
 
   return sourceDirs;
 }
+
+export async function mapProjects(mainPath) {
+  const projectDirs = await findSourceDirectories(mainPath);
+
+  return projectDirs.map((path) => ({
+    name: path.split("/").pop(),
+    path,
+  }));
+}
