@@ -13,19 +13,6 @@ export default function displayBanner() {
     )
   );
 
-  //   const title = chalk.greenBright(
-  //     figlet.textSync("DNGmode", {
-  //       font: "Slant",
-  //       horizontalLayout: "default",
-  //       verticalLayout: "default",
-  //     })
-  //   );
-
-  //   const terminalWidth = process.stdout.columns; // get terminal width
-  //   const textwidth = title.split("\n")[0].length;
-
-  //   const padding = Math.max(0, Math.floor((terminalWidth - textwidth) / 2));
-
   console.log(
     chalk.whiteBright(`
   Welcome to ${chalk.bold.blue(
@@ -41,7 +28,7 @@ export default function displayBanner() {
   console.log(
     chalk.yellowBright(`
   Usage:
-    dng choose                   Choose Between Projects
+    dng open                     Display available projects
     dng open <project-name>      Open a specific project
     dng todo <project-name>      Manage your project to-dos
     dng help                     Show all available commands
