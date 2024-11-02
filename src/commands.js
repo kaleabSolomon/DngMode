@@ -54,3 +54,19 @@ export async function openProjectFromName(projectName) {
     console.error("an error occured", err);
   }
 }
+export function openSpotify() {
+  const spotifyProcess = spawn("spotify", [], {
+    stdio: ["inherit", "inherit", "ignore"],
+  });
+  spotifyProcess.on("error", (error) => {
+    console.error("Error opening Spotify:", error.message);
+  });
+}
+export function openPostman() {
+  const spotifyProcess = spawn("postman", [], {
+    stdio: ["inherit", "inherit", "ignore"],
+  });
+  spotifyProcess.on("error", (error) => {
+    console.error("Error opening Postman:", error.message);
+  });
+}

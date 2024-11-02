@@ -1,6 +1,11 @@
 import displayBanner from "./welcome.js";
 import { Command } from "commander";
-import { openProjectFromName, openProjects } from "./commands.js";
+import {
+  openPostman,
+  openProjectFromName,
+  openProjects,
+  openSpotify,
+} from "./commands.js";
 
 const program = new Command();
 
@@ -15,13 +20,16 @@ async function main() {
     .command("open")
     .description("List all projects and open the selected one in Vs Code")
     .argument("[projectName]", "name of project to open")
-    .action(async (projectName) => {
+    .option("-s, --spotify", "Open Spotify alongside project")
+    .option("-p, --postman", "Open Postman alongside project")
+    .action(async (projectName, options) => {
+      if (options.spotify) openSpotify();
+      if (options.postman) openPostman();
       projectName ? openProjectFromName(projectName) : await openProjects();
     });
 
   program.parse(process.argv);
 
-  // Display help if no command is specified
   if (!process.argv.slice(2).length) {
     program.outputHelp();
   }
