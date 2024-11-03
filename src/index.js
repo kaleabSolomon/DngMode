@@ -18,9 +18,14 @@ const dng = program
   .action(displayBanner);
 
 async function main() {
-  const projectList = await mapProjects("/home/kaleab/Documents/Dev/");
+  dng
+    .command("init-todos")
+    .description("initialize a todo database for each project")
+    .action(async () => {
+      const projectList = await mapProjects("/home/kaleab/Documents/Dev/");
+      initializeProjectTodos(projectList);
+    });
 
-  initializeProjectTodos(projectList);
   dng
     .command("open")
     .description("List all projects and open the selected one in Vs Code")
