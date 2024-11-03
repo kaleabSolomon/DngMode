@@ -6,6 +6,8 @@ import {
   openProjectFromName,
   openProjects,
   openSpotify,
+  readConfig,
+  writeConfig,
 } from "./actions.js";
 import {
   initializeProjectTodos,
@@ -27,10 +29,33 @@ const dng = program
 
 async function main() {
   dng
+    .command("register")
+    .description("Register a main directory for your projects")
+    .action(async () => {
+      const { mainDir } = await inquirer.prompt([
+        {
+          type: "input",
+          name: "mainDir",
+          message: "Enter the main directory path for your projects:",
+          validate: (input) =>
+            input.length > 0 || "Please enter a valid directory path",
+        },
+      ]);
+      writeConfig(mainDir);
+    });
+  dng
     .command("init-todos")
     .description("initialize a todo database for each project")
     .action(async () => {
-      const projectList = await mapProjects("/home/kaleab/Documents/Dev/");
+      const mainDir = readConfig().mainDirectory;
+
+      if (!mainDir) {
+        console.log(
+          "No main directory registered. Please run the register command first."
+        );
+        return;
+      }
+      const projectList = await mapProjects(mainDir);
       initializeProjectTodos(projectList);
     });
   // Command to add a todo to a specific project

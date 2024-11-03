@@ -28,10 +28,11 @@ export default function displayBanner() {
   console.log(
     chalk.yellowBright(`
   Usage:
-    dng open                     Display available projects
-    dng open <project-name>      Open a specific project
-    dng todo <project-name>      Manage your project to-dos
-    dng help                     Show all available commands
+   init-todos                    initialize a todo database for each project
+   add-todo <projectName>        Add a new todo task to a specific project
+   list-todos <projectName>      List all todos for a specific project
+   open [options] [projectName]  List all projects and open the selected one in Vs Code
+   dng --help                     Show all available commands
   `)
   );
 

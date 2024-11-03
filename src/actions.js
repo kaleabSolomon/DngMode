@@ -1,6 +1,10 @@
 import inquirer from "inquirer";
 import { spawn } from "child_process";
 import { mapProjects } from "./utils/listDir.js";
+import path from "path";
+import fs from "fs";
+
+const configPath = path.join(process.cwd(), "dng.config.json");
 
 export async function chooseProject(projectList) {
   const projectNames = projectList.map((project) => project.name);
@@ -35,7 +39,15 @@ export function openProject(path) {
 }
 export async function openProjects() {
   try {
-    const projectList = await mapProjects("/home/kaleab/Documents/Dev/");
+    const mainDir = readConfig().mainDirectory;
+    if (!mainDir) {
+      console.log(
+        "No main directory registered. Please run the register command first."
+      );
+      return;
+    }
+
+    const projectList = await mapProjects(mainDir);
     const selectedProjectPath = await chooseProject(projectList);
     openProject(selectedProjectPath);
   } catch (error) {
@@ -45,7 +57,15 @@ export async function openProjects() {
 
 export async function openProjectFromName(projectName) {
   try {
-    const projectList = await mapProjects("/home/kaleab/Documents/Dev/");
+    const mainDir = readConfig().mainDirectory;
+    if (!mainDir) {
+      console.log(
+        "No main directory registered. Please run the register command first."
+      );
+      return;
+    }
+
+    const projectList = await mapProjects(mainDir);
     const selectedProjectPath = projectList.find(
       (project) => project.name === projectName
     ).path;
@@ -97,4 +117,18 @@ export async function getTaskFromInput(projectName) {
   ]);
 
   return { task, priority };
+}
+// Function to read configuration
+export function readConfig() {
+  try {
+    const configData = fs.readFileSync(configPath, "utf8");
+    return JSON.parse(configData);
+  } catch (error) {
+    console.error("Error reading config file:", error);
+    return { mainDirectory: "" };
+  }
+}
+// Function to write configuration
+export function writeConfig(mainDirectory) {
+  fs.writeFileSync(configPath, JSON.stringify({ mainDirectory }, null, 2));
 }
