@@ -6,6 +6,8 @@ import {
   openProjects,
   openSpotify,
 } from "./commands.js";
+import { initializeProjectTodos } from "./utils/db.js";
+import { mapProjects } from "./utils/listDir.js";
 
 const program = new Command();
 
@@ -16,6 +18,9 @@ const dng = program
   .action(displayBanner);
 
 async function main() {
+  const projectList = await mapProjects("/home/kaleab/Documents/Dev/");
+
+  initializeProjectTodos(projectList);
   dng
     .command("open")
     .description("List all projects and open the selected one in Vs Code")

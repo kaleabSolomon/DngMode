@@ -4,6 +4,7 @@ import { mapProjects } from "./utils/listDir.js";
 
 export async function chooseProject(projectList) {
   const projectNames = projectList.map((project) => project.name);
+
   const { selectedProject } = await inquirer.prompt([
     {
       type: "list",
