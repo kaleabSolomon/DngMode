@@ -31,3 +31,15 @@ export async function initializeProjectTodos(projectList) {
     }
   });
 }
+
+export function addTodo(projectName, task) {
+  const stmt = db.prepare(
+    `INSERT INTO todos (projectName, task) VALUES (?, ?)`
+  );
+  stmt.run(projectName, task);
+}
+// Retrieve all to-dos for a specific project
+export function getTodos(projectName) {
+  const stmt = db.prepare(`SELECT * FROM todos WHERE projectName = ?`);
+  return stmt.all(projectName);
+}
