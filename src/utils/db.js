@@ -8,6 +8,7 @@ db.prepare(
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     projectName TEXT NOT NULL,
     task TEXT NOT NULL,
+    priority TEXT DEFAULT 'Medium',
     isDone BOOLEAN DEFAULT 0
     )
     `
@@ -32,14 +33,20 @@ export async function initializeProjectTodos(projectList) {
   });
 }
 
-export function addTodo(projectName, task) {
-  const stmt = db.prepare(
-    `INSERT INTO todos (projectName, task) VALUES (?, ?)`
-  );
-  stmt.run(projectName, task);
+export function addTodo(projectName, task, priority) {
+  db.prepare(
+    `INSERT INTO todos (projectName, task, priority) VALUES (?, ?, ?)`
+  ).run(projectName, task, priority);
 }
 // Retrieve all to-dos for a specific project
 export function getTodos(projectName) {
   const stmt = db.prepare(`SELECT * FROM todos WHERE projectName = ?`);
   return stmt.all(projectName);
+}
+
+export function markTodosAsDone(todoIds) {
+  const stmt = db.prepare("UPDATE todos SET isDone = 1 WHERE id = ?");
+  todoIds.forEach((id) => {
+    stmt.run(id);
+  });
 }

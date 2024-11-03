@@ -1,13 +1,21 @@
 import displayBanner from "./welcome.js";
 import { Command } from "commander";
 import {
+  getTaskFromInput,
   openPostman,
   openProjectFromName,
   openProjects,
   openSpotify,
-} from "./commands.js";
-import { initializeProjectTodos, addTodo, getTodos } from "./utils/db.js";
+} from "./actions.js";
+import {
+  initializeProjectTodos,
+  addTodo,
+  getTodos,
+  markTodosAsDone,
+} from "./utils/db.js";
 import { mapProjects } from "./utils/listDir.js";
+import inquirer from "inquirer";
+import { styleTask } from "./utils/styleTasks.js";
 
 const program = new Command();
 
@@ -30,9 +38,9 @@ async function main() {
     .command("add-todo")
     .description("Add a new todo task to a specific project")
     .argument("<projectName>", "Name of the project")
-    .argument("<task>", "The todo task to add")
-    .action((projectName, task) => {
-      addTodo(projectName, task);
+    .action(async (projectName) => {
+      const { task, priority } = await getTaskFromInput(projectName);
+      addTodo(projectName, task, priority);
       console.log(`Added task "${task}" to project "${projectName}"`);
     });
 
@@ -40,12 +48,31 @@ async function main() {
     .command("list-todos")
     .description("List all todos for a specific project")
     .argument("<projectName>", "Name of the project")
-    .action((projectName) => {
+    .action(async (projectName) => {
       const todos = getTodos(projectName);
-      console.log(`Todos for project "${projectName}":`);
-      todos.forEach((todo, index) => {
-        console.log(`${index + 1}. ${todo.task}`);
-      });
+      if (todos.length === 0) {
+        console.log(`No tasks were found for ${projectName}`);
+      }
+
+      // get the todos in an inquirer checkbox format
+      const todoChoices = todos.map((todo) => ({
+        name: styleTask(todo.task, todo.priority),
+        value: todo.id,
+        checked: todo.isDone,
+        priority: todo.priority,
+      }));
+
+      const { completedTasks } = await inquirer.prompt([
+        {
+          type: "checkbox",
+          name: "completedTasks",
+          message: `Todos for project "${projectName}" - Check to mark as done:`,
+          choices: todoChoices,
+        },
+      ]);
+
+      markTodosAsDone(completedTasks);
+      console.log("Updated tasks as done.");
     });
 
   dng
@@ -55,10 +82,26 @@ async function main() {
     .option("-s, --spotify", "Open Spotify alongside project")
     .option("-p, --postman", "Open Postman alongside project")
     .action(async (projectName, options) => {
-      if (options.spotify) openSpotify();
-      if (options.postman) openPostman();
-      projectName ? openProjectFromName(projectName) : await openProjects();
+      try {
+        if (options.spotify) openSpotify();
+        if (options.postman) openPostman();
+        projectName ? openProjectFromName(projectName) : await openProjects();
+      } catch (error) {
+        if (
+          error.name === "ExitPromptError" ||
+          error.message.includes("force closed")
+        ) {
+          console.log("Prompt canceled by the user. Exiting...");
+        } else {
+          console.error("An error occurred:", error);
+        }
+      }
     });
+
+  process.on("SIGINT", () => {
+    console.log("\nOperation canceled. Exiting...");
+    process.exit(0);
+  });
 
   program.parse(process.argv);
 

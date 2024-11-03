@@ -71,3 +71,30 @@ export function openPostman() {
     console.error("Error opening Postman:", error.message);
   });
 }
+export async function getTaskFromInput(projectName) {
+  const { task } = await inquirer.prompt([
+    {
+      type: "input",
+      name: "task",
+      message: `Enter a task for the project "${projectName}":`,
+    },
+  ]);
+
+  // Validate task input
+  if (!task || task.trim() === "") {
+    console.error("Task cannot be empty. Please enter a valid task.");
+    return; // or throw an error, or exit, etc.
+  }
+
+  const { priority } = await inquirer.prompt([
+    {
+      type: "list",
+      name: "priority",
+      message: "Select Priority Level: ",
+      choices: ["Low", "Medium", "High"],
+      default: "Medium",
+    },
+  ]);
+
+  return { task, priority };
+}
