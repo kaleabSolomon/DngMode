@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 import displayBanner from "./welcome.js";
 import { Command } from "commander";
 import {
@@ -17,7 +19,9 @@ import {
 } from "./utils/db.js";
 import { mapProjects } from "./utils/listDir.js";
 import inquirer from "inquirer";
-import { styleTask } from "./utils/styleTasks.js";
+import { styleTask } from "./helpers/styleTasks.js";
+
+import { getMainDir } from "./helpers/getMainDir.js";
 
 const program = new Command();
 
@@ -47,14 +51,8 @@ async function main() {
     .command("init-todos")
     .description("initialize a todo database for each project")
     .action(async () => {
-      const mainDir = readConfig().mainDirectory;
+      const mainDir = getMainDir();
 
-      if (!mainDir) {
-        console.log(
-          "No main directory registered. Please run the register command first."
-        );
-        return;
-      }
       const projectList = await mapProjects(mainDir);
       initializeProjectTodos(projectList);
     });
@@ -95,9 +93,8 @@ async function main() {
           choices: todoChoices,
         },
       ]);
-
       markTodosAsDone(completedTasks);
-      console.log("Updated tasks as done.");
+      console.log("Updated Completed Tasks.");
     });
 
   dng

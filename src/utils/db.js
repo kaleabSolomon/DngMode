@@ -40,11 +40,15 @@ export function addTodo(projectName, task, priority) {
 }
 // Retrieve all to-dos for a specific project
 export function getTodos(projectName) {
-  const stmt = db.prepare(`SELECT * FROM todos WHERE projectName = ?`);
+  const stmt = db.prepare(
+    `SELECT * FROM todos WHERE projectName = ? ORDER BY isDone ASC`
+  );
   return stmt.all(projectName);
 }
 
 export function markTodosAsDone(todoIds) {
+  db.prepare("UPDATE todos SET isDone = 0").run();
+
   const stmt = db.prepare("UPDATE todos SET isDone = 1 WHERE id = ?");
   todoIds.forEach((id) => {
     stmt.run(id);

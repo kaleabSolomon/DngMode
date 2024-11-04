@@ -3,6 +3,7 @@ import { spawn } from "child_process";
 import { mapProjects } from "./utils/listDir.js";
 import path from "path";
 import fs from "fs";
+import { getMainDir } from "./helpers/getMainDir.js";
 
 const configPath = path.join(process.cwd(), "dng.config.json");
 
@@ -39,13 +40,7 @@ export function openProject(path) {
 }
 export async function openProjects() {
   try {
-    const mainDir = readConfig().mainDirectory;
-    if (!mainDir) {
-      console.log(
-        "No main directory registered. Please run the register command first."
-      );
-      return;
-    }
+    const mainDir = getMainDir();
 
     const projectList = await mapProjects(mainDir);
     const selectedProjectPath = await chooseProject(projectList);
@@ -57,13 +52,7 @@ export async function openProjects() {
 
 export async function openProjectFromName(projectName) {
   try {
-    const mainDir = readConfig().mainDirectory;
-    if (!mainDir) {
-      console.log(
-        "No main directory registered. Please run the register command first."
-      );
-      return;
-    }
+    const mainDir = getMainDir();
 
     const projectList = await mapProjects(mainDir);
     const selectedProjectPath = projectList.find(
