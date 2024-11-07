@@ -1,6 +1,6 @@
 {
   "name": "dngmode",
-  "version": "1.0.9",
+  "version": "1.0.10",
   "main": "index.js",
   "type": "module",
   "bin": {
@@ -10,7 +10,9 @@
     "start": "node index.js"
   },
   "keywords": [
-    "CLI"
+    "CLI",
+    "Developer Workflow",
+    "Project Management"
   ],
   "author": "kaleabSolomon <kaleabslmn@gmail.com>",
   "license": "MIT",
