@@ -28,7 +28,7 @@ const program = new Command();
 
 program
   .description("CLI Tool for managing projects")
-  .version("1.0.6")
+  .version("1.0.9")
   .action(displayBanner);
 
 async function main() {
@@ -81,7 +81,7 @@ async function main() {
     .description("List all todos for a specific project")
     .argument("<projectName>", "Name of the project")
     .action(async (projectName) => {
-      if (checkProjectExists(projectName)) {
+      if (!checkProjectExists(projectName)) {
         console.error("Could not find Project ", projectName);
         return;
       }
