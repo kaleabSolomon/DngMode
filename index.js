@@ -9,7 +9,6 @@ import {
   openProjectFromName,
   openProjects,
   openSpotify,
-  readConfig,
   writeConfig,
 } from "./src/actions.js";
 import {
@@ -28,7 +27,7 @@ const program = new Command();
 
 program
   .description("CLI Tool for managing projects")
-  .version("1.0.10")
+  .version("1.0.11")
   .action(displayBanner);
 
 async function main() {
