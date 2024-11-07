@@ -5,8 +5,10 @@ import path from "path";
 import fs from "fs";
 import { getMainDir } from "./helpers/getMainDir.js";
 
-const configPath = path.join(process.cwd(), "dng.config.json");
-
+const configPath = path.join(
+  process.env.HOME || process.env.USERPROFILE,
+  "dng.config.json"
+);
 export async function chooseProject(projectList) {
   const projectNames = projectList.map((project) => project.name);
 
@@ -55,11 +57,14 @@ export async function openProjectFromName(projectName) {
     const mainDir = getMainDir();
 
     const projectList = await mapProjects(mainDir);
-    const selectedProjectPath = projectList.find(
+    const selectedProject = projectList.find(
       (project) => project.name === projectName
-    ).path;
-    if (!selectedProjectPath) console.log("not found");
-    openProject(selectedProjectPath);
+    );
+    if (selectedProject === undefined) {
+      console.error("No project with given name found!");
+      return;
+    }
+    openProject(selectedProject.path);
   } catch (err) {
     console.error("an error occured", err);
   }
@@ -81,31 +86,39 @@ export function openPostman() {
   });
 }
 export async function getTaskFromInput(projectName) {
-  const { task } = await inquirer.prompt([
-    {
-      type: "input",
-      name: "task",
-      message: `Enter a task for the project "${projectName}":`,
-    },
-  ]);
+  try {
+    const { task } = await inquirer.prompt([
+      {
+        type: "input",
+        name: "task",
+        message: `Enter a task for the project "${projectName}":`,
+      },
+    ]);
 
-  // Validate task input
-  if (!task || task.trim() === "") {
-    console.error("Task cannot be empty. Please enter a valid task.");
-    return; // or throw an error, or exit, etc.
+    // Validate task input
+    if (!task || task.trim() === "") {
+      console.error("Task cannot be empty. Please enter a valid task.");
+      return; // or throw an error, or exit, etc.
+    }
+
+    const { priority } = await inquirer.prompt([
+      {
+        type: "list",
+        name: "priority",
+        message: "Select Priority Level: ",
+        choices: ["Low", "Medium", "High"],
+        default: "Medium",
+      },
+    ]);
+
+    return { task, priority };
+  } catch (error) {
+    if (error.isTtyError)
+      console.error("Prompt couldn't be rendered in the current environment.");
+    else {
+      console.error("An unexpected error occurred:", error);
+    }
   }
-
-  const { priority } = await inquirer.prompt([
-    {
-      type: "list",
-      name: "priority",
-      message: "Select Priority Level: ",
-      choices: ["Low", "Medium", "High"],
-      default: "Medium",
-    },
-  ]);
-
-  return { task, priority };
 }
 // Function to read configuration
 export function readConfig() {

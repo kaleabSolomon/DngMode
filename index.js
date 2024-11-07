@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import displayBanner from "./welcome.js";
+import displayBanner from "./src/welcome.js";
 import { Command } from "commander";
 import {
   getTaskFromInput,
@@ -10,29 +10,28 @@ import {
   openSpotify,
   readConfig,
   writeConfig,
-} from "./actions.js";
+} from "./src/actions.js";
 import {
   initializeProjectTodos,
   addTodo,
   getTodos,
   markTodosAsDone,
-} from "./utils/db.js";
-import { mapProjects } from "./utils/listDir.js";
+} from "./src/utils/db.js";
+import { mapProjects } from "./src/utils/listDir.js";
 import inquirer from "inquirer";
-import { styleTask } from "./helpers/styleTasks.js";
+import { styleTask } from "./src/helpers/styleTasks.js";
 
-import { getMainDir } from "./helpers/getMainDir.js";
+import { getMainDir } from "./src/helpers/getMainDir.js";
 
 const program = new Command();
 
-const dng = program
-  .command("dng")
+program
   .description("CLI Tool for managing projects")
-  .version("1.0.0")
+  .version("1.0.6")
   .action(displayBanner);
 
 async function main() {
-  dng
+  program
     .command("register")
     .description("Register a main directory for your projects")
     .action(async () => {
@@ -47,7 +46,7 @@ async function main() {
       ]);
       writeConfig(mainDir);
     });
-  dng
+  program
     .command("init-todos")
     .description("initialize a todo database for each project")
     .action(async () => {
@@ -57,7 +56,7 @@ async function main() {
       initializeProjectTodos(projectList);
     });
   // Command to add a todo to a specific project
-  dng
+  program
     .command("add-todo")
     .description("Add a new todo task to a specific project")
     .argument("<projectName>", "Name of the project")
@@ -67,7 +66,7 @@ async function main() {
       console.log(`Added task "${task}" to project "${projectName}"`);
     });
 
-  dng
+  program
     .command("list-todos")
     .description("List all todos for a specific project")
     .argument("<projectName>", "Name of the project")
@@ -97,7 +96,7 @@ async function main() {
       console.log("Updated Completed Tasks.");
     });
 
-  dng
+  program
     .command("open")
     .description("List all projects and open the selected one in Vs Code")
     .argument("[projectName]", "name of project to open")
@@ -126,10 +125,5 @@ async function main() {
   });
 
   program.parse(process.argv);
-
-  if (!process.argv.slice(2).length) {
-    program.outputHelp();
-  }
 }
-
 main();
