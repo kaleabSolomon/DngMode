@@ -33,7 +33,7 @@ export async function initializeProjectTodos(projectList) {
   });
 }
 
-export function addTodo(projectName, task, priority) {
+export async function addTodo(projectName, task, priority) {
   db.prepare(
     `INSERT INTO todos (projectName, task, priority) VALUES (?, ?, ?)`
   ).run(projectName, task, priority);

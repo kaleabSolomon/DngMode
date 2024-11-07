@@ -5,25 +5,57 @@ import path from "path";
 import fs from "fs";
 import { getMainDir } from "./helpers/getMainDir.js";
 
+process.on("SIGINT", () => {
+  console.log("\nOperation canceled. Exiting...");
+  process.exit(0);
+});
+
 const configPath = path.join(
   process.env.HOME || process.env.USERPROFILE,
   "dng.config.json"
 );
+
+export async function getProjectList() {
+  const mainDir = getMainDir();
+  return await mapProjects(mainDir);
+}
+
+export async function checkProjectExists(projectName) {
+  const projectList = await getProjectList();
+
+  const selectedProject = projectList.find(
+    (project) => project.name === projectName
+  );
+  return !!selectedProject;
+}
 export async function chooseProject(projectList) {
   const projectNames = projectList.map((project) => project.name);
 
-  const { selectedProject } = await inquirer.prompt([
-    {
-      type: "list",
-      name: "selectedProject",
-      message: "select a project to open",
-      choices: projectList,
-    },
-  ]);
-  const path = projectList.find(
-    (project) => project.name === selectedProject
-  ).path;
-  return path;
+  try {
+    const { selectedProject } = await inquirer.prompt([
+      {
+        type: "list",
+        name: "selectedProject",
+        message: "Select a project to open",
+        choices: projectNames,
+      },
+    ]);
+
+    if (!selectedProject) return null;
+
+    const path = projectList.find(
+      (project) => project.name === selectedProject
+    ).path;
+
+    return path;
+  } catch (error) {
+    if (error.name === "ExitPromptError") {
+      console.error("Prompt has been forcefully closed.");
+      return null; // Return null to signify no selection
+    }
+    // Re-throw error if it's not handled here
+    throw error;
+  }
 }
 
 export function openProject(path) {
@@ -42,10 +74,9 @@ export function openProject(path) {
 }
 export async function openProjects() {
   try {
-    const mainDir = getMainDir();
-
-    const projectList = await mapProjects(mainDir);
+    const projectList = await getProjectList();
     const selectedProjectPath = await chooseProject(projectList);
+    if (!selectedProjectPath) return;
     openProject(selectedProjectPath);
   } catch (error) {
     console.error("an error occured", error);
@@ -54,9 +85,7 @@ export async function openProjects() {
 
 export async function openProjectFromName(projectName) {
   try {
-    const mainDir = getMainDir();
-
-    const projectList = await mapProjects(mainDir);
+    const projectList = await getProjectList();
     const selectedProject = projectList.find(
       (project) => project.name === projectName
     );
@@ -95,6 +124,8 @@ export async function getTaskFromInput(projectName) {
       },
     ]);
 
+    if (!task) return null;
+
     // Validate task input
     if (!task || task.trim() === "") {
       console.error("Task cannot be empty. Please enter a valid task.");
@@ -111,13 +142,16 @@ export async function getTaskFromInput(projectName) {
       },
     ]);
 
+    if (!priority) return null;
+
     return { task, priority };
   } catch (error) {
-    if (error.isTtyError)
-      console.error("Prompt couldn't be rendered in the current environment.");
-    else {
-      console.error("An unexpected error occurred:", error);
+    if (error.name === "ExitPromptError") {
+      console.error("Prompt has been forcefully closed.");
+      return null; // Return null to signify no selection
     }
+    // Re-throw error if it's not handled here
+    throw error;
   }
 }
 // Function to read configuration

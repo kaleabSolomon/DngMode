@@ -3,6 +3,7 @@
 import displayBanner from "./src/welcome.js";
 import { Command } from "commander";
 import {
+  checkProjectExists,
   getTaskFromInput,
   openPostman,
   openProjectFromName,
@@ -61,7 +62,16 @@ async function main() {
     .description("Add a new todo task to a specific project")
     .argument("<projectName>", "Name of the project")
     .action(async (projectName) => {
-      const { task, priority } = await getTaskFromInput(projectName);
+      if (!checkProjectExists(projectName)) {
+        console.error("Could not find Project ", projectName);
+        return;
+      }
+      const taskData = await getTaskFromInput(projectName);
+
+      if (!taskData) {
+        return;
+      }
+      const { task, priority } = taskData;
       addTodo(projectName, task, priority);
       console.log(`Added task "${task}" to project "${projectName}"`);
     });
@@ -71,6 +81,10 @@ async function main() {
     .description("List all todos for a specific project")
     .argument("<projectName>", "Name of the project")
     .action(async (projectName) => {
+      if (checkProjectExists(projectName)) {
+        console.error("Could not find Project ", projectName);
+        return;
+      }
       const todos = getTodos(projectName);
       if (todos.length === 0) {
         console.log(`No tasks were found for ${projectName}`);
@@ -103,26 +117,12 @@ async function main() {
     .option("-s, --spotify", "Open Spotify alongside project")
     .option("-p, --postman", "Open Postman alongside project")
     .action(async (projectName, options) => {
-      try {
-        if (options.spotify) openSpotify();
-        if (options.postman) openPostman();
-        projectName ? openProjectFromName(projectName) : await openProjects();
-      } catch (error) {
-        if (
-          error.name === "ExitPromptError" ||
-          error.message.includes("force closed")
-        ) {
-          console.log("Prompt canceled by the user. Exiting...");
-        } else {
-          console.error("An error occurred:", error);
-        }
-      }
+      if (options.spotify) openSpotify();
+      if (options.postman) openPostman();
+      projectName
+        ? await openProjectFromName(projectName)
+        : await openProjects();
     });
-
-  process.on("SIGINT", () => {
-    console.log("\nOperation canceled. Exiting...");
-    process.exit(0);
-  });
 
   program.parse(process.argv);
 }
