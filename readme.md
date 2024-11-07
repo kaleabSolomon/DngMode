@@ -52,10 +52,10 @@ Once installed, run commands using the `dng` keyword.
 
 ### Commands
 
+- `dng register`: Register directory with projects.
 - `dng open`: List and select a project to open in VS Code.
 - `dng add-todo <projectName>`: Add a new to-do item to a specific project, with options to set task priorities.
 - `dng list-todos <projectName>`: View all to-do items for a project.
-- `dng --version`: Display the current version of DngMode.
 
 ### Example Usage
 
