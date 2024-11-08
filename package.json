@@ -15,6 +15,10 @@
     "Project Management"
   ],
   "author": "kaleabSolomon <kaleabslmn@gmail.com>",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/kaleabSolomon/dngmode.git"
+  },
   "license": "MIT",
   "dependencies": {
     "asciiart-logo": "^0.2.7",
